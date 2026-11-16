@@ -509,31 +509,72 @@ async function loadDashboardViews() {
 
 async function loadProductsCRUD() {
   const { data, error } = await supabaseClient
-    .from('store_products')
+    .from('movies')
     .select('*')
-    .order('product_id', { ascending: false })
-    .limit(15);
+    .order('movie_id', { ascending: false })
+    .limit(20);
 
   if (error) return;
 
   let html = '<table class="min-w-full text-xs text-left border-collapse">';
-  html += '<thead class="bg-slate-800 text-amber-300"><tr><th class="p-2.5">ID</th><th class="p-2.5">Store</th><th class="p-2.5">Code</th><th class="p-2.5">ชื่อสินค้า</th><th class="p-2.5">ราคา</th><th class="p-2.5 text-center">จัดการ</th></tr></thead><tbody class="divide-y divide-slate-800 bg-slate-900/60">';
+  html += '<thead class="bg-slate-800 text-amber-300"><tr><th class="p-2.5">ID</th><th class="p-2.5">ชื่อภาพยนตร์ (Title)</th><th class="p-2.5">ความยาว</th><th class="p-2.5">เรตผู้ชม</th><th class="p-2.5">วันที่เข้าฉาย</th><th class="p-2.5 text-center">จัดการ</th></tr></thead><tbody class="divide-y divide-slate-800 bg-slate-900/60">';
 
   data.forEach(item => {
     html += `<tr class="hover:bg-slate-800/70">
-      <td class="p-2.5">${item.product_id}</td>
-      <td class="p-2.5">${item.store_id}</td>
-      <td class="p-2.5 text-slate-400">${item.product_code || '-'}</td>
-      <td class="p-2.5 font-medium text-white">${item.name}</td>
-      <td class="p-2.5 text-emerald-400 font-semibold">${Number(item.price).toLocaleString()} ฿</td>
+      <td class="p-2.5">${item.movie_id}</td>
+      <td class="p-2.5 font-bold text-white">${item.title}</td>
+      <td class="p-2.5 text-slate-300">${item.duration_min} นาที</td>
+      <td class="p-2.5"><span class="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-bold">${item.age_rating || 'G'}</span></td>
+      <td class="p-2.5 text-slate-400">${item.release_date || '2026-11-21'}</td>
       <td class="p-2.5 text-center space-x-3">
-        <button onclick='editProduct(${JSON.stringify(item)})' class="text-amber-400 hover:underline font-medium">แก้ไข</button>
-        <button onclick="deleteProduct(${item.product_id})" class="text-rose-400 hover:underline font-medium">ลบ</button>
+        <button onclick='editMovieCRUD(${JSON.stringify(item)})' class="text-amber-400 hover:underline font-medium cursor-pointer">แก้ไข</button>
+        <button onclick="deleteMovieCRUD(${item.movie_id})" class="text-rose-400 hover:underline font-medium cursor-pointer">ลบ</button>
       </td>
     </tr>`;
   });
   html += '</tbody></table>';
   document.getElementById('crud-products-table').innerHTML = html;
+}
+
+async function saveMovieCRUD(e) {
+  e.preventDefault();
+  const id = document.getElementById('crud-movie-id').value;
+  const payload = {
+    title: document.getElementById('crud-movie-title').value,
+    duration_min: parseInt(document.getElementById('crud-movie-duration').value),
+    age_rating: document.getElementById('crud-movie-rating').value,
+    release_date: '2026-11-21'
+  };
+
+  if (id) {
+    await supabaseClient.from('movies').update(payload).eq('movie_id', id);
+  } else {
+    await supabaseClient.from('movies').insert([payload]);
+  }
+  resetMovieForm();
+  loadProductsCRUD();
+  loadUserPortal(); // อัปเดตหน้าเลือกหนัง 10 เรื่องฝั่งลูกค้าให้ตรงกันทันที
+}
+
+function editMovieCRUD(item) {
+  document.getElementById('crud-movie-id').value = item.movie_id;
+  document.getElementById('crud-movie-title').value = item.title;
+  document.getElementById('crud-movie-duration').value = item.duration_min;
+  document.getElementById('crud-movie-rating').value = item.age_rating || 'PG-13';
+  document.getElementById('crud-submit-btn').textContent = 'อัปเดต';
+}
+
+async function deleteMovieCRUD(id) {
+  if (!confirm('ยืนยันการลบภาพยนตร์เรื่องนี้ออกจากโปรแกรมฉาย?')) return;
+  await supabaseClient.from('movies').delete().eq('movie_id', id);
+  loadProductsCRUD();
+  loadUserPortal();
+}
+
+function resetMovieForm() {
+  document.getElementById('movie-crud-form').reset();
+  document.getElementById('crud-movie-id').value = '';
+  document.getElementById('crud-submit-btn').textContent = 'บันทึก';
 }
 
 async function saveProduct(e) {
