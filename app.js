@@ -422,7 +422,6 @@ async function submitUserBooking(e) {
 
   const { data, error } = await supabaseClient.from('cinema_bookings').insert([{
     customer_id: 1,
-    showtime_id: selectedShowtimeObj?.showtime_id || 1,
     status: 'CONFIRMED',
     original_amount: seatTotal + snackPrice,
     discount_amount: discount,
