@@ -497,43 +497,35 @@ function renderHtmlTable(rows) {
 }
 
 async function loadDashboardViews() {
+  // 1. สรุปรายได้ภาพยนตร์ (View ของโรงหนัง)
   const { data: movies } = await supabaseClient.from('v_movie_box_office_summary').select('*');
   document.getElementById('view-movies-table').innerHTML = renderHtmlTable(movies);
 
-  const { data: stores } = await supabaseClient.from('v_store_performance_summary').select('*').limit(10);
-  document.getElementById('view-stores-table').innerHTML = renderHtmlTable(stores);
+  // 2. ตารางรอบฉายภาพยนตร์พร้อมชื่อหนังและชื่อโรง
+  const { data: showtimes } = await supabaseClient
+    .from('showtimes')
+    .select('showtime_id, show_date, start_time, base_price, movies(title), cinema_halls(name)')
+    .order('show_date', { ascending: true })
+    .limit(15);
 
-  const { data: redemptions } = await supabaseClient.from('v_cross_campaign_redemptions').select('*');
-  document.getElementById('view-redemptions-table').innerHTML = renderHtmlTable(redemptions);
-}
+  const formattedShowtimes = (showtimes || []).map(s => ({
+    SHOWTIME_ID: s.showtime_id,
+    MOVIE_TITLE: s.movies?.title || '-',
+    THEATRE: s.cinema_halls?.name || '-',
+    SHOW_DATE: s.show_date,
+    START_TIME: s.start_time,
+    BASE_PRICE: `${s.base_price} ฿`
+  }));
+  document.getElementById('view-stores-table').innerHTML = renderHtmlTable(formattedShowtimes);
 
-async function loadProductsCRUD() {
-  const { data, error } = await supabaseClient
-    .from('movies')
-    .select('*')
-    .order('movie_id', { ascending: false })
-    .limit(20);
+  // 3. รายการจองตั๋วภาพยนตร์ล่าสุดทั้งหมด
+  const { data: bookings } = await supabaseClient
+    .from('cinema_bookings')
+    .select('booking_id, customer_id, booking_time, status, original_amount, discount_amount, final_amount')
+    .order('booking_id', { ascending: false })
+    .limit(15);
 
-  if (error) return;
-
-  let html = '<table class="min-w-full text-xs text-left border-collapse">';
-  html += '<thead class="bg-slate-800 text-amber-300"><tr><th class="p-2.5">ID</th><th class="p-2.5">ชื่อภาพยนตร์ (Title)</th><th class="p-2.5">ความยาว</th><th class="p-2.5">เรตผู้ชม</th><th class="p-2.5">วันที่เข้าฉาย</th><th class="p-2.5 text-center">จัดการ</th></tr></thead><tbody class="divide-y divide-slate-800 bg-slate-900/60">';
-
-  data.forEach(item => {
-    html += `<tr class="hover:bg-slate-800/70">
-      <td class="p-2.5">${item.movie_id}</td>
-      <td class="p-2.5 font-bold text-white">${item.title}</td>
-      <td class="p-2.5 text-slate-300">${item.duration_min} นาที</td>
-      <td class="p-2.5"><span class="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-bold">${item.age_rating || 'G'}</span></td>
-      <td class="p-2.5 text-slate-400">${item.release_date || '2026-11-21'}</td>
-      <td class="p-2.5 text-center space-x-3">
-        <button onclick='editMovieCRUD(${JSON.stringify(item)})' class="text-amber-400 hover:underline font-medium cursor-pointer">แก้ไข</button>
-        <button onclick="deleteMovieCRUD(${item.movie_id})" class="text-rose-400 hover:underline font-medium cursor-pointer">ลบ</button>
-      </td>
-    </tr>`;
-  });
-  html += '</tbody></table>';
-  document.getElementById('crud-products-table').innerHTML = html;
+  document.getElementById('view-redemptions-table').innerHTML = renderHtmlTable(bookings);
 }
 
 async function saveMovieCRUD(e) {
