@@ -467,39 +467,71 @@
     </div>
   </div>
 
-  <!-- POPUP MODAL: E-TICKET SUMMARY (หน้าสรุปตั๋วหนังหลังกดบันทึก) -->
+  <!-- POPUP MODAL: E-TICKET SUMMARY (หน้าตั๋วหนังฉบับเต็มหลังชำระเงิน) -->
   <div id="eticket-modal"
-    class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-50 flex items-center justify-center p-4">
     <div
-      class="bg-slate-900 border-2 border-amber-500/60 max-w-sm w-full rounded-3xl overflow-hidden shadow-2xl text-white">
-      <div class="gold-gradient p-4 text-slate-950 text-center">
-        <div class="text-[10px] font-black tracking-widest uppercase">GRAND CINEPLEX E-TICKET</div>
-        <h3 class="text-lg font-extrabold">จองตั๋วภาพยนตร์สำเร็จ!</h3>
-      </div>
-      <div class="p-6 space-y-4 text-xs">
-        <div class="text-center border-b border-dashed border-slate-700 pb-4">
-          <div id="ticket-movie" class="text-lg font-bold text-amber-400">Dune: Part Two</div>
-          <div id="ticket-showtime" class="text-slate-300 mt-1">Theater 1 • 2026-11-16 13:45</div>
+      class="bg-zinc-900 border-2 border-amber-500/70 max-w-md w-full rounded-3xl overflow-hidden shadow-[0_0_50px_rgba(245,158,11,0.3)] text-white relative">
+      <!-- หัวตั๋วสีทอง -->
+      <div class="gold-gradient px-6 py-4 text-slate-950 flex justify-between items-center">
+        <div>
+          <div class="text-[10px] font-black tracking-widest uppercase">GRAND CINEPLEX • E-TICKET</div>
+          <h3 class="text-lg font-extrabold">ชำระเงินและออกตั๋วสำเร็จ</h3>
         </div>
-        <div class="grid grid-cols-2 gap-3 bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+        <span class="text-2xl">🎟️</span>
+      </div>
+
+      <!-- ตัวตั๋วแสดงข้อมูลหนัง วันที่ เวลา โรง และที่นั่ง -->
+      <div class="p-6 space-y-4 text-xs">
+        <div class="flex gap-4 items-center border-b border-dashed border-zinc-700 pb-4">
+          <img id="ticket-poster" src="" alt="Poster"
+            class="w-16 h-24 object-cover rounded-xl border border-zinc-600 shadow" />
+          <div class="space-y-1">
+            <span
+              class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">CONFIRMED</span>
+            <h4 id="ticket-movie" class="text-lg font-extrabold text-amber-400 leading-tight">Movie Title</h4>
+            <p class="text-zinc-400">พารากอน ซีนีเพล็กซ์ (Paragon Cineplex)</p>
+          </div>
+        </div>
+
+        <!-- รายละเอียด 4 ช่องสำคัญ: วันที่, เวลา, โรงภาพยนตร์, ที่นั่ง -->
+        <div class="grid grid-cols-2 gap-3 bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
           <div>
-            <span class="text-slate-500 block">ที่นั่ง (Seats)</span>
-            <span id="ticket-seats" class="font-bold text-sm text-white">H-12</span>
+            <span class="text-zinc-500 block text-[11px]">📅 วันที่ฉาย (Date)</span>
+            <span id="ticket-date" class="font-bold text-sm text-white">2026-11-21</span>
           </div>
           <div class="text-right">
-            <span class="text-slate-500 block">ยอดชำระสุทธิ</span>
-            <span id="ticket-total" class="font-extrabold text-base text-amber-400">470 ฿</span>
+            <span class="text-zinc-500 block text-[11px]">⏰ เวลาฉาย (Time)</span>
+            <span id="ticket-time" class="font-extrabold text-sm text-amber-400">18:10 น.</span>
+          </div>
+          <div class="pt-1 border-t border-zinc-800/80">
+            <span class="text-zinc-500 block text-[11px]">🏛️ โรงภาพยนตร์ (Theatre)</span>
+            <span id="ticket-hall" class="font-bold text-sm text-white">Theatre 1 (IMAX)</span>
+          </div>
+          <div class="text-right pt-1 border-t border-zinc-800/80">
+            <span class="text-zinc-500 block text-[11px]">💺 ที่นั่ง (Seats)</span>
+            <span id="ticket-seats" class="font-extrabold text-sm text-emerald-400">B13, B14</span>
           </div>
         </div>
+
+        <!-- สรุปยอดชำระสุทธิ -->
+        <div class="flex justify-between items-center bg-zinc-800/60 px-4 py-2.5 rounded-xl border border-zinc-700">
+          <span class="text-zinc-300 font-medium">ยอดชำระสุทธิ (Net Paid)</span>
+          <span id="ticket-total" class="font-black text-lg text-amber-400">470 THB</span>
+        </div>
+
+        <!-- บาร์โค้ดจำลอง -->
         <div class="text-center pt-1">
-          <div class="bg-white text-slate-950 font-mono font-bold py-2 px-4 rounded-lg tracking-widest text-sm">
+          <div
+            class="bg-white text-slate-950 font-mono font-black py-2.5 px-4 rounded-xl tracking-[0.25em] text-sm shadow-inner">
             |||| ||| || |||| ||| #BK-<span id="ticket-id">101</span>
           </div>
-          <p class="text-[10px] text-slate-400 mt-2">บันทึกข้อมูลลงตาราง cinema_bookings เรียบร้อยแล้ว</p>
+          <p class="text-[10px] text-zinc-400 mt-2">บันทึกข้อมูลลงตาราง cinema_bookings ใน Supabase เรียบร้อยแล้ว</p>
         </div>
-        <button onclick="document.getElementById('eticket-modal').classList.add('hidden')"
-          class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl transition">
-          ปิดหน้าต่างตั๋ว
+
+        <button onclick="closeTicketModal()"
+          class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold py-3 rounded-xl text-sm transition cursor-pointer">
+          เสร็จสิ้น (กลับหน้าหลัก)
         </button>
       </div>
     </div>

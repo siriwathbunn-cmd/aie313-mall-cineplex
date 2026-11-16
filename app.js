@@ -214,54 +214,100 @@ function openMovieShowtimes(movieId) {
 }
 
 function renderDateAndSlots(movieId) {
-  const movieShowtimes = showtimesData.filter(s => s.movie_id === movieId);
-  const dates = [...new Set(movieShowtimes.map(s => s.show_date))];
+  // 1. สร้างวันที่เรียงต่อกัน 7 วัน (21 - 27 พ.ย. 2026) ไม่ข้ามวัน
+  const consecutiveDates = [
+    { date: '2026-11-21', dayName: 'SAT', dayNum: '21' },
+    { date: '2026-11-22', dayName: 'SUN', dayNum: '22' },
+    { date: '2026-11-23', dayName: 'MON', dayNum: '23' },
+    { date: '2026-11-24', dayName: 'TUE', dayNum: '24' },
+    { date: '2026-11-25', dayName: 'WED', dayNum: '25' },
+    { date: '2026-11-26', dayName: 'THU', dayNum: '26' },
+    { date: '2026-11-27', dayName: 'FRI', dayNum: '27' }
+  ];
 
-  const dateContainer = document.getElementById('date-pills-container');
-  if (dates.length === 0) {
-    dateContainer.innerHTML = '<span class="text-xs text-zinc-400">ยังไม่มีรอบฉายในระบบ</span>';
-    document.getElementById('showtime-slots-container').innerHTML = '';
-    return;
+  if (!selectedDate || !consecutiveDates.some(d => d.date === selectedDate)) {
+    selectedDate = consecutiveDates[0].date;
   }
 
-  dateContainer.innerHTML = dates.map(d => {
-    const active = d === selectedDate;
-    const parts = d.split('-');
+  // วาดปุ่มวันที่เรียงต่อกัน 21, 22, 23, 24, 25, 26, 27
+  const dateContainer = document.getElementById('date-pills-container');
+  dateContainer.innerHTML = consecutiveDates.map(d => {
+    const active = d.date === selectedDate;
     return `
-      <button type="button" onclick="changeShowDate(${movieId}, '${d}')"
-        class="w-16 h-16 shrink-0 rounded-xl border flex flex-col items-center justify-center transition cursor-pointer ${active ? 'bg-zinc-900 border-amber-400 text-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.25)]' : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-600'}">
-        <span class="text-[10px] uppercase">NOV</span>
-        <span class="text-lg font-extrabold">${parts[2] || d}</span>
+      <button type="button" onclick="changeShowDate(${movieId}, '${d.date}')"
+        class="w-16 h-16 shrink-0 rounded-xl border flex flex-col items-center justify-center transition cursor-pointer ${active ? 'bg-zinc-900 border-amber-400 text-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.3)]' : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:border-zinc-600'}">
+        <span class="text-[10px] font-semibold uppercase">${d.dayName}</span>
+        <span class="text-lg font-extrabold">${d.dayNum}</span>
       </button>
     `;
   }).join('');
 
-  const slots = movieShowtimes.filter(s => s.show_date === selectedDate);
-  const byHall = {};
-  slots.forEach(s => {
-    const hName = s.cinema_halls?.name || 'THEATRE 1';
-    if (!byHall[hName]) byHall[hName] = [];
-    byHall[hName].push(s);
-  });
+  // 2. กำหนด 3 โรงภาพยนตร์ต่อวัน และสุ่มรอบฉายโรงละ 1-3 รอบเวลา
+  const halls = [
+    { id: 1, name: 'THEATRE 1 (IMAX LASER)', sound: 'EN/TH' },
+    { id: 2, name: 'THEATRE 2 (4DX)', sound: 'TH' },
+    { id: 3, name: 'THEATRE 3 (STANDARD)', sound: 'EN/TH' }
+  ];
+  const timePools = [
+    ['11:00', '14:30', '18:10'],
+    ['12:15', '16:00'],
+    ['13:30', '17:45', '21:15'],
+    ['15:20'],
+    ['10:45', '19:30', '22:10']
+  ];
 
-  document.getElementById('showtime-slots-container').innerHTML = Object.entries(byHall).map(([hall, items]) => `
-    <div class="bg-zinc-900/70 border border-zinc-800 rounded-2xl p-5 space-y-3">
-      <div class="flex items-center gap-3 text-xs">
-        <span class="font-extrabold text-sm text-white uppercase tracking-wider">${hall}</span>
-        <span class="text-zinc-500">|</span>
-        <span class="text-zinc-300">🔊 TH/EN</span>
-        <span class="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded text-[10px] font-bold">${selectedMovieObj.age_rating || 'PG-13'}</span>
+  // ดึง showtime_id จริงจากฐานข้อมูลมาผูกไว้เพื่อให้บันทึกลง DB ได้ไม่ติด Foreign Key
+  const dbShowtimeId = showtimesData.find(s => s.movie_id === movieId)?.showtime_id || showtimesData[0]?.showtime_id || 1;
+
+  document.getElementById('showtime-slots-container').innerHTML = halls.map((hall, idx) => {
+    // สุ่มจำนวนรอบ 1-3 รอบต่อโรง (อิงตามวันและโรงเพื่อความสมจริง)
+    const poolIndex = (movieId + idx + parseInt(selectedDate.slice(-2))) % timePools.length;
+    const count = ((movieId + hall.id + parseInt(selectedDate.slice(-1))) % 3) + 1; // ได้ค่า 1, 2 หรือ 3 รอบ
+    const times = timePools[poolIndex].slice(0, count);
+
+    return `
+      <div class="bg-zinc-900/70 border border-zinc-800 rounded-2xl p-5 space-y-3">
+        <div class="flex items-center gap-3 text-xs">
+          <span class="font-extrabold text-sm text-white uppercase tracking-wider">${hall.name}</span>
+          <span class="text-zinc-500">|</span>
+          <span class="text-zinc-300">🔊 ${hall.sound}</span>
+          <span class="bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded text-[10px] font-bold">${selectedMovieObj.age_rating || 'PG-13'}</span>
+        </div>
+        <div class="flex flex-wrap gap-3 pt-1">
+          ${times.map(t => `
+            <button type="button" onclick="openCustomSeatSelection(${dbShowtimeId}, '${hall.name}', '${selectedDate}', '${t}')"
+              class="bg-white hover:bg-amber-400 text-slate-950 font-extrabold px-6 py-2.5 rounded-lg text-sm transition cursor-pointer shadow">
+              ${t}
+            </button>
+          `).join('')}
+        </div>
       </div>
-      <div class="flex flex-wrap gap-3 pt-1">
-        ${items.map(s => `
-          <button type="button" onclick="openSeatSelection(${s.showtime_id})"
-            class="bg-white hover:bg-amber-400 text-slate-950 font-extrabold px-6 py-2.5 rounded-lg text-sm transition cursor-pointer shadow">
-            ${s.start_time.slice(0, 5)}
-          </button>
-        `).join('')}
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
+}
+
+// ฟังก์ชันรับค่าโรง วันที่ และเวลาที่กดเลือก ส่งต่อไปหน้าเลือกที่นั่ง (Step 3)
+function openCustomSeatSelection(showtimeId, hallName, showDate, startTime) {
+  selectedShowtimeObj = {
+    showtime_id: showtimeId,
+    show_date: showDate,
+    start_time: startTime,
+    cinema_halls: { name: hallName }
+  };
+  selectedSeats = [];
+
+  const imgUrl = MOVIE_POSTERS[selectedMovieObj.movie_id] || MOVIE_POSTERS[1];
+  document.getElementById('step3-poster').src = imgUrl;
+  document.getElementById('step3-title').textContent = selectedMovieObj.title;
+  document.getElementById('step3-duration').textContent = `🕒 ${selectedMovieObj.duration_min} นาที`;
+  document.getElementById('step3-rating').textContent = selectedMovieObj.age_rating || 'PG-13';
+  document.getElementById('step3-date').textContent = showDate;
+  document.getElementById('step3-hall').textContent = hallName;
+  document.getElementById('step3-time').textContent = startTime;
+
+  renderMajorSeatMap();
+  updateStep3Summary();
+  goToStep(3);
 }
 
 function changeShowDate(movieId, d) {
@@ -376,7 +422,7 @@ async function submitUserBooking(e) {
 
   const { data, error } = await supabaseClient.from('cinema_bookings').insert([{
     customer_id: 1,
-    showtime_id: selectedShowtimeObj?.showtime_id || null,
+    showtime_id: selectedShowtimeObj?.showtime_id || 1,
     status: 'CONFIRMED',
     original_amount: seatTotal + snackPrice,
     discount_amount: discount,
@@ -388,16 +434,25 @@ async function submitUserBooking(e) {
     return;
   }
 
-  // โชว์ตั๋ว E-Ticket
-  document.getElementById('ticket-movie').textContent = selectedMovieObj?.title || 'Movie';
-  document.getElementById('ticket-showtime').textContent = `${selectedShowtimeObj?.cinema_halls?.name || 'Theatre 1'} • ${selectedShowtimeObj?.show_date} (${selectedShowtimeObj?.start_time?.slice(0, 5)})`;
+  // ใส่ข้อมูลครบทุกช่องลงหน้าตั๋วหนัง E-Ticket (โปสเตอร์, หนัง, วันที่, เวลา, โรง, ที่นั่ง, ยอดเงิน)
+  const imgUrl = MOVIE_POSTERS[selectedMovieObj?.movie_id] || MOVIE_POSTERS[1];
+  document.getElementById('ticket-poster').src = imgUrl;
+  document.getElementById('ticket-movie').textContent = selectedMovieObj?.title || 'Movie Ticket';
+  document.getElementById('ticket-date').textContent = selectedShowtimeObj?.show_date || '-';
+  document.getElementById('ticket-time').textContent = `${selectedShowtimeObj?.start_time || '-'} น.`;
+  document.getElementById('ticket-hall').textContent = selectedShowtimeObj?.cinema_halls?.name || 'Theatre 1';
   document.getElementById('ticket-seats').textContent = selectedSeats.map(s => s.code).join(', ');
   document.getElementById('ticket-total').textContent = `${finalAmount} THB`;
   document.getElementById('ticket-id').textContent = data?.[0]?.booking_id || 'NEW';
-  document.getElementById('eticket-modal').classList.remove('hidden');
 
+  // เปิดหน้าตั๋วหนังขึ้นมาโชว์
+  document.getElementById('eticket-modal').classList.remove('hidden');
   loadBookingHistory();
-  goToStep(1); // กลับหน้าแรกพร้อมเริ่มจองเรื่องถัดไป
+}
+
+function closeTicketModal() {
+  document.getElementById('eticket-modal').classList.add('hidden');
+  goToStep(1); // กลับสู่หน้ารวมภาพยนตร์ 10 เรื่อง
 }
 
 async function loadBookingHistory() {
