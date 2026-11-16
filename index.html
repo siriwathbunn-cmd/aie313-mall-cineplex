@@ -1,150 +1,143 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Integrated Mall & Cineplex System (AIE313)</title>
+  <title>Mall & Cineplex Complex (User & Admin Views)</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans">
 
-  <!-- Navbar -->
-  <nav class="bg-indigo-900 text-white shadow-md">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center">
-      <div class="font-bold text-lg tracking-wide">🎬 Mall & Cineplex Complex</div>
-      <div id="nav-links" class="hidden space-x-2 flex items-center">
-        <button onclick="switchTab('dashboard')" class="tab-btn px-3 py-1.5 rounded bg-indigo-700 hover:bg-indigo-600 text-sm">📊 Dashboard (Views)</button>
-        <button onclick="switchTab('crud')" class="tab-btn px-3 py-1.5 rounded hover:bg-indigo-700 text-sm">🛠️ จัดการสินค้า (CRUD)</button>
-        <button onclick="switchTab('chat')" class="tab-btn px-3 py-1.5 rounded hover:bg-indigo-700 text-sm">🤖 AI SQL Assistant</button>
-        <span id="user-badge" class="text-xs bg-indigo-950 px-2.5 py-1 rounded-full border border-indigo-500"></span>
-        <button onclick="handleLogout()" class="px-3 py-1.5 rounded bg-rose-600 hover:bg-rose-500 text-sm">ออกจากระบบ</button>
+<body class="bg-slate-100 text-slate-800 font-sans">
+
+  <!-- Top Navbar + AI Command Bar -->
+  <nav class="bg-indigo-950 text-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+      <div class="flex items-center gap-3">
+        <span class="font-bold text-lg tracking-wide">🎬 Mall & Cineplex</span>
+        <div id="role-switcher" class="hidden bg-indigo-900 p-1 rounded-lg text-xs flex gap-1">
+          <button id="btn-user-view" onclick="switchRole('user')"
+            class="px-3 py-1.5 rounded bg-indigo-600 font-medium">👤 ฝั่งลูกค้า (User View)</button>
+          <button id="btn-admin-view" onclick="switchRole('admin')"
+            class="px-3 py-1.5 rounded hover:bg-indigo-800 font-medium">🛠️ ฝั่งแอดมิน (Admin View)</button>
+        </div>
+      </div>
+
+      <div id="nav-right" class="hidden flex items-center gap-3">
+        <button onclick="toggleBotModal()"
+          class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3.5 py-1.5 rounded-full text-xs shadow flex items-center gap-1">
+          🤖 AI สั่งการ / ค้นหา
+        </button>
+        <span id="user-badge" class="text-xs text-indigo-200"></span>
+        <button onclick="handleLogout()" class="bg-rose-600 hover:bg-rose-500 px-3 py-1.5 rounded text-xs">ออก</button>
       </div>
     </div>
   </nav>
 
-  <!-- Section 0: Auth (Login / Register) -->
-  <section id="auth-section" class="max-w-md mx-auto mt-16 bg-white p-8 rounded-xl shadow-md border border-slate-200">
-    <h2 class="text-2xl font-bold text-center text-indigo-900 mb-6">เข้าสู่ระบบ / สมัครสมาชิก</h2>
+  <!-- LOGIN / REGISTER SECTION -->
+  <section id="auth-section" class="max-w-md mx-auto mt-16 bg-white p-8 rounded-2xl shadow-md border">
+    <h2 class="text-2xl font-bold text-center text-indigo-950 mb-2">ยินดีต้อนรับสู่ระบบสมาชิก & โรงหนัง</h2>
+    <p class="text-xs text-center text-slate-500 mb-6">เข้าสู่ระบบเพื่อใช้งานฝั่งลูกค้า (User) และผู้ดูแลระบบ (Admin)
+    </p>
     <div class="space-y-4">
       <div>
-        <label class="block text-sm font-medium mb-1">อีเมล (Email)</label>
-        <input id="auth-email" type="email" placeholder="student@bu.ac.th" class="w-full border rounded-lg px-3 py-2 focus:outline-indigo-600" />
+        <label class="block text-xs font-semibold mb-1">อีเมล (Email)</label>
+        <input id="auth-email" type="email" placeholder="student@bu.ac.th"
+          class="w-full border rounded-lg px-3 py-2 text-sm" />
       </div>
       <div>
-        <label class="block text-sm font-medium mb-1">รหัสผ่าน (Password)</label>
-        <input id="auth-password" type="password" placeholder="อย่างน้อย 6 ตัวอักษร" class="w-full border rounded-lg px-3 py-2 focus:outline-indigo-600" />
+        <label class="block text-xs font-semibold mb-1">รหัสผ่าน (Password)</label>
+        <input id="auth-password" type="password" placeholder="อย่างน้อย 6 ตัวอักษร"
+          class="w-full border rounded-lg px-3 py-2 text-sm" />
       </div>
       <div class="flex gap-3 pt-2">
-        <button onclick="handleLogin()" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg">เข้าสู่ระบบ (Login)</button>
-        <button onclick="handleRegister()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium py-2 rounded-lg">สมัครสมาชิก</button>
+        <button onclick="handleLogin()"
+          class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg text-sm">เข้าสู่ระบบ</button>
+        <button onclick="handleRegister()"
+          class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium py-2 rounded-lg text-sm">สมัครสมาชิก</button>
       </div>
-      <p id="auth-msg" class="text-sm text-center text-rose-600 mt-2"></p>
+      <p id="auth-msg" class="text-xs text-center text-rose-600 mt-2"></p>
     </div>
   </section>
 
-  <!-- Main Content Container -->
-  <main id="app-main" class="hidden max-w-7xl mx-auto px-4 py-8">
+  <!-- MAIN APPLICATION -->
+  <main id="app-main" class="hidden max-w-7xl mx-auto px-4 py-6">
 
-    <!-- TAB 1: DASHBOARD (VIEWS) -->
-    <section id="tab-dashboard" class="space-y-8">
-      <div class="flex justify-between items-center">
-        <h1 class="text-2xl font-bold text-slate-900">📊 รายงานวิเคราะห์ข้อมูลจาก Database Views</h1>
-        <button onclick="loadDashboardViews()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700">🔄 รีเฟรชข้อมูล</button>
-      </div>
-
-      <!-- View 1: v_movie_box_office_summary -->
-      <div class="bg-white p-6 rounded-xl shadow-sm border">
-        <h3 class="font-bold text-lg text-indigo-900 mb-3">1. สรุปรายได้และยอดขายตั๋วภาพยนตร์ (View: v_movie_box_office_summary)</h3>
-        <div class="overflow-x-auto" id="view-movies-table">กำลังโหลด...</div>
-      </div>
-
-      <!-- View 2: v_store_performance_summary -->
-      <div class="bg-white p-6 rounded-xl shadow-sm border">
-        <h3 class="font-bold text-lg text-indigo-900 mb-3">2. สรุปยอดขายร้านค้าแยกตามโซนในห้าง (View: v_store_performance_summary)</h3>
-        <div class="overflow-x-auto" id="view-stores-table">กำลังโหลด...</div>
-      </div>
-
-      <!-- View 3: v_cross_campaign_redemptions -->
-      <div class="bg-white p-6 rounded-xl shadow-sm border">
-        <h3 class="font-bold text-lg text-indigo-900 mb-3">3. สถิติการใช้คูปองแต้มห้างลดราคาตั๋วหนัง (View: v_cross_campaign_redemptions)</h3>
-        <div class="overflow-x-auto" id="view-redemptions-table">กำลังโหลด...</div>
-      </div>
-    </section>
-
-    <!-- TAB 2: CRUD MANAGEMENT -->
-    <section id="tab-crud" class="hidden space-y-6">
-      <h1 class="text-2xl font-bold text-slate-900">🛠️ จัดการข้อมูลสินค้าในร้านค้า (CRUD: store_products)</h1>
-
-      <!-- Create / Update Form -->
-      <form id="product-form" onsubmit="saveProduct(event)" class="bg-white p-6 rounded-xl shadow-sm border grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-        <input type="hidden" id="prod-id" />
+    <!-- ============================================================== -->
+    <!-- VIEW 1: ฝั่งผู้ใช้งาน (USER / CUSTOMER VIEW)                    -->
+    <!-- ============================================================== -->
+    <div id="view-user" class="space-y-6">
+      <!-- ข้อมูลบัตรสมาชิกห้าง (เชื่อมระบบ Loyalty) -->
+      <div
+        class="bg-gradient-to-r from-indigo-900 to-purple-900 text-white p-6 rounded-2xl shadow-md flex flex-wrap justify-between items-center gap-4">
         <div>
-          <label class="block text-xs font-medium mb-1">รหัสร้านค้า (Store ID: 1-30)</label>
-          <input id="prod-store-id" type="number" min="1" max="30" required value="1" class="w-full border rounded px-3 py-2 text-sm" />
+          <span class="text-xs uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full">Mall Loyalty Member
+            Card</span>
+          <h2 id="member-name" class="text-2xl font-bold mt-1">Somchai Prasert (Tier: Classic)</h2>
+          <p class="text-xs text-indigo-200 mt-1">ใช้แต้มสะสมจากห้างแลกคูปองเพื่อลดราคาตั๋วหนังได้ทันที</p>
         </div>
-        <div>
-          <label class="block text-xs font-medium mb-1">รหัสสินค้า (Code)</label>
-          <input id="prod-code" type="text" required placeholder="เช่น ZR-999" class="w-full border rounded px-3 py-2 text-sm" />
+        <div class="text-right">
+          <div class="text-xs text-indigo-200">คะแนนสะสมคงเหลือ</div>
+          <div id="member-points" class="text-3xl font-extrabold text-amber-400">450 PTS</div>
         </div>
-        <div>
-          <label class="block text-xs font-medium mb-1">ชื่อสินค้า</label>
-          <input id="prod-name" type="text" required placeholder="ชื่อสินค้า..." class="w-full border rounded px-3 py-2 text-sm" />
-        </div>
-        <div>
-          <label class="block text-xs font-medium mb-1">ราคา (บาท)</label>
-          <input id="prod-price" type="number" step="0.01" required placeholder="0.00" class="w-full border rounded px-3 py-2 text-sm" />
-        </div>
-        <div class="flex gap-2">
-          <button type="submit" id="crud-submit-btn" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-3 rounded text-sm font-medium">บันทึกข้อมูล</button>
-          <button type="button" onclick="resetProductForm()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 py-2 px-3 rounded text-sm">ล้างค่า</button>
-        </div>
-      </form>
-
-      <!-- Read Table -->
-      <div class="bg-white p-6 rounded-xl shadow-sm border">
-        <div class="overflow-x-auto" id="crud-products-table">กำลังโหลดรายการสินค้า...</div>
       </div>
-    </section>
 
-    <!-- TAB 3: AI CHATBOT -->
-    <section id="tab-chat" class="hidden max-w-4xl mx-auto">
-      <div class="bg-white rounded-xl shadow-md border overflow-hidden flex flex-col h-[75vh]">
-        <div class="bg-indigo-900 text-white px-6 py-4">
-          <h2 class="font-bold text-lg">🤖 ผู้ช่วยวิเคราะห์ฐานข้อมูลอัจฉริยะ (Text-to-SQL Chatbot)</h2>
-          <p class="text-xs text-indigo-200">สอบถามข้อมูลห้างและโรงหนังด้วยภาษาไทย/อังกฤษ ระบบจะสร้าง SQL จริงและแสดงหลักฐานผลลัพธ์</p>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- ฟอร์มจองตั๋วหนัง + สั่งป๊อปคอร์น + ใช้คูปองส่วนลดห้าง -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border space-y-4">
+          <h3 class="font-bold text-lg text-indigo-950 border-b pb-2">🎟️ จองตั๋วภาพยนตร์ & ใช้คูปองส่วนลดห้าง</h3>
+          <form id="user-booking-form" onsubmit="submitUserBooking(event)" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold mb-1">1. เลือกรอบฉายภาพยนตร์ (Showtime)</label>
+                <select id="book-showtime" onchange="calculateBookingTotal()"
+                  class="w-full border rounded-lg px-3 py-2 text-sm bg-white"></select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold mb-1">2. เลือกชุดป๊อปคอร์น/เครื่องดื่ม (Concession)</label>
+                <select id="book-concession" onchange="calculateBookingTotal()"
+                  class="w-full border rounded-lg px-3 py-2 text-sm bg-white"></select>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold mb-1">3. เลือกใช้คูปองส่วนลดจากห้าง (Customer Coupons)</label>
+              <select id="book-coupon" onchange="calculateBookingTotal()"
+                class="w-full border rounded-lg px-3 py-2 text-sm bg-amber-50 border-amber-300"></select>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-lg border flex justify-between items-center">
+              <div class="text-xs space-y-1">
+                <div>ราคาตั๋ว + ของว่าง: <span id="calc-original" class="font-semibold">0</span> บาท</div>
+                <div class="text-emerald-600">ส่วนลดคูปองห้าง: -<span id="calc-discount" class="font-semibold">0</span>
+                  บาท</div>
+              </div>
+              <div class="text-right">
+                <div class="text-xs text-slate-500">ยอดชำระสุทธิ</div>
+                <div class="text-2xl font-bold text-indigo-700"><span id="calc-final">0</span> ฿</div>
+              </div>
+            </div>
+
+            <button type="submit"
+              class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-lg shadow">
+              ยืนยันการจองตั๋วภาพยนตร์
+            </button>
+          </form>
         </div>
 
-        <!-- Sample Prompts -->
-        <div class="bg-indigo-50 px-4 py-2 border-b flex flex-wrap gap-2 text-xs">
-          <span class="font-semibold text-indigo-900 py-1">ตัวอย่างคำถาม:</span>
-          <button onclick="setQuestion('มีสินค้าอะไรบ้างที่ราคาเกิน 2000 บาท')" class="bg-white border border-indigo-200 px-2.5 py-1 rounded-full hover:bg-indigo-100">สินค้าที่ราคาเกิน 2,000 บาท</button>
-          <button onclick="setQuestion('ลูกค้าคนไหนมียอดซื้อสะสมสูงสุด 5 อันดับแรก')" class="bg-white border border-indigo-200 px-2.5 py-1 rounded-full hover:bg-indigo-100">ลูกค้ายอดซื้อสูงสุด 5 อันดับ</button>
-          <button onclick="setQuestion('ยอดขายรวมของร้านค้าแยกตามหมวดหมู่เป็นเท่าไหร่')" class="bg-white border border-indigo-200 px-2.5 py-1 rounded-full hover:bg-indigo-100">ยอดขายรวมแยกตามหมวดหมู่</button>
-        </div>
-
-        <!-- Chat History -->
-        <div id="chat-messages" class="flex-1 p-6 overflow-y-auto space-y-4 bg-slate-50">
-          <div class="bg-white p-4 rounded-lg border shadow-sm text-sm">
-            สวัสดีครับ! พิมพ์คำถามเกี่ยวกับข้อมูลสมาชิก ร้านค้า รอบฉาย หรือการจองตั๋วหนังได้เลยครับ
+        <!-- ประวัติการจองของลูกค้า (กดยกเลิกเอง หรือสั่งบอทยกเลิกก็ได้) -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border flex flex-col">
+          <div class="flex justify-between items-center border-b pb-2 mb-3">
+            <h3 class="font-bold text-base text-slate-900">📋 ประวัติการจองของคุณ</h3>
+            <button onclick="loadUserPortal()" class="text-xs text-indigo-600 hover:underline">รีเฟรช</button>
           </div>
+          <div id="user-bookings-list" class="space-y-3 overflow-y-auto max-h-96 flex-1 text-xs">กำลังโหลด...</div>
         </div>
-
-        <!-- Loading Indicator -->
-        <div id="chat-loading" class="hidden px-6 py-2 bg-amber-50 text-amber-800 text-xs font-medium border-t">
-          ⏳ กำลังให้ AI สร้างคำสั่ง SQL และดึงข้อมูลจริงจาก Supabase...
-        </div>
-
-        <!-- Input Box -->
-        <form onsubmit="sendChatQuestion(event)" class="p-4 bg-white border-t flex gap-3">
-          <input id="chat-input" type="text" required placeholder="พิมพ์คำถามภาษาไทยหรืออังกฤษที่นี่..." class="flex-1 border rounded-lg px-4 py-2.5 text-sm focus:outline-indigo-600" />
-          <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg text-sm font-medium">ส่งคำถาม</button>
-        </form>
       </div>
-    </section>
+    </div>
 
-  </main>
-
-  <script src="app.js"></script>
-</body>
-</html>
+    <!-- ============================================================== -->
+    <!-- VIEW 2: ฝั่งผู้ดูแลระบบ (ADMIN / BACKEND VIEW)                 -->
+    <!-- ============================================================== -->
+    <div id="view-admin" class="hidden space-y
