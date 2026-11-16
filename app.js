@@ -8,16 +8,16 @@ let couponsData = [];
 
 // ภาพโปสเตอร์ประกอบสวยๆ ตามรหัสหนัง (movie_id 1-10)
 const MOVIE_POSTERS = {
-  1: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=500&q=80', // Joker
-  2: 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=500&q=80', // Titanic
-  3: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=500&q=80', // Avatar
-  4: 'https://images.unsplash.com/photo-1635805737707-575885ab0820?auto=format&fit=crop&w=500&q=80', // Spider-Man
-  5: 'https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?auto=format&fit=crop&w=500&q=80', // Godzilla
-  6: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=500&q=80', // Transformers
-  7: 'https://images.unsplash.com/photo-1551269901-5c5e14c25df7?auto=format&fit=crop&w=500&q=80', // Harry potter
-  8: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=500&q=80', // Star wars
-  9: 'https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=500&q=80', // Alien: Romulus
-  10: 'https://images.unsplash.com/photo-1516728778615-2d590ea1855e?auto=format&fit=crop&w=500&q=80' // Jurassic
+  1: 'https://i.pinimg.com/736x/42/bb/ba/42bbbaefd687903bc80b02c014e64a5b.jpg', // Joker
+  2: 'https://i.pinimg.com/736x/a5/db/1c/a5db1c46a01a5e26115ed1690d95bbd4.jpg', // Titanic
+  3: 'https://i.pinimg.com/736x/fc/64/f4/fc64f4ef0381331d52a80b204ce75749.jpg', // Avatar
+  4: 'https://i.pinimg.com/1200x/2b/74/6b/2b746bc85973887c1cdc4da17a1a03f0.jpg', // Spider-Man
+  5: 'https://i.pinimg.com/736x/ff/f6/bf/fff6bf99bc04449c9b65a16402ebf743.jpg', // Godzilla
+  6: 'https://i.pinimg.com/1200x/d3/5c/c8/d35cc8fe1a80b13da3799e4e0dd435b9.jpg', // Transformers
+  7: 'https://i.pinimg.com/1200x/fa/8c/80/fa8c80b1695d091d62efef11ef07d9de.jpg', // Harry potter
+  8: 'https://i.pinimg.com/736x/ca/00/2e/ca002e2a376766389d00d71a7c750504.jpg', // Star wars
+  9: 'https://i.pinimg.com/1200x/4f/80/a3/4f80a372b6e7d4b9d7197c50583f3619.jpg', // Alien: Romulus
+  10: 'https://i.pinimg.com/1200x/8e/78/6f/8e786f9347cb239f46f174ab1f521df9.jpg' // Jurassic
 };
 
 window.addEventListener('DOMContentLoaded', () => {
