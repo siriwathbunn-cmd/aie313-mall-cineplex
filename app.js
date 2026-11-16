@@ -6,18 +6,17 @@ let showtimesData = [];
 let concessionsData = [];
 let couponsData = [];
 
-// ภาพโปสเตอร์ประกอบสวยๆ ตามรหัสหนัง (movie_id 1-10)
 const MOVIE_POSTERS = {
-  1: 'https://i.pinimg.com/736x/42/bb/ba/42bbbaefd687903bc80b02c014e64a5b.jpg', // Joker
-  2: 'https://i.pinimg.com/736x/a5/db/1c/a5db1c46a01a5e26115ed1690d95bbd4.jpg', // Titanic
-  3: 'https://i.pinimg.com/736x/fc/64/f4/fc64f4ef0381331d52a80b204ce75749.jpg', // Avatar
-  4: 'https://i.pinimg.com/1200x/2b/74/6b/2b746bc85973887c1cdc4da17a1a03f0.jpg', // Spider-Man
-  5: 'https://i.pinimg.com/736x/ff/f6/bf/fff6bf99bc04449c9b65a16402ebf743.jpg', // Godzilla
-  6: 'https://i.pinimg.com/1200x/d3/5c/c8/d35cc8fe1a80b13da3799e4e0dd435b9.jpg', // Transformers
-  7: 'https://i.pinimg.com/1200x/fa/8c/80/fa8c80b1695d091d62efef11ef07d9de.jpg', // Harry potter
-  8: 'https://i.pinimg.com/736x/ca/00/2e/ca002e2a376766389d00d71a7c750504.jpg', // Star wars
-  9: 'https://i.pinimg.com/1200x/4f/80/a3/4f80a372b6e7d4b9d7197c50583f3619.jpg', // Alien: Romulus
-  10: 'https://i.pinimg.com/1200x/8e/78/6f/8e786f9347cb239f46f174ab1f521df9.jpg' // Jurassic
+  1: 'https://i.pinimg.com/736x/42/bb/ba/42bbbaefd687903bc80b02c014e64a5b.jpg',
+  2: 'https://i.pinimg.com/736x/a5/db/1c/a5db1c46a01a5e26115ed1690d95bbd4.jpg',
+  3: 'https://i.pinimg.com/736x/fc/64/f4/fc64f4ef0381331d52a80b204ce75749.jpg',
+  4: 'https://i.pinimg.com/1200x/2b/74/6b/2b746bc85973887c1cdc4da17a1a03f0.jpg',
+  5: 'https://i.pinimg.com/736x/ff/f6/bf/fff6bf99bc04449c9b65a16402ebf743.jpg',
+  6: 'https://i.pinimg.com/1200x/d3/5c/c8/d35cc8fe1a80b13da3799e4e0dd435b9.jpg',
+  7: 'https://i.pinimg.com/1200x/fa/8c/80/fa8c80b1695d091d62efef11ef07d9de.jpg',
+  8: 'https://i.pinimg.com/736x/ca/00/2e/ca002e2a376766389d00d71a7c750504.jpg',
+  9: 'https://i.pinimg.com/1200x/4f/80/a3/4f80a372b6e7d4b9d7197c50583f3619.jpg',
+  10: 'https://i.pinimg.com/1200x/8e/78/6f/8e786f9347cb239f46f174ab1f521df9.jpg'
 };
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -105,13 +104,13 @@ async function handleLogout() {
 }
 
 // ==========================================
-// 2. ฝั่งลูกค้า: Wizard 4 ขั้นตอนแบบ Major Cineplex
+// 2. ฝั่งลูกค้า: Wizard 4 ขั้นตอนแบบ CINE MALL
 // ==========================================
 let allMoviesData = [];
 let selectedMovieObj = null;
 let selectedDate = null;
 let selectedShowtimeObj = null;
-let selectedSeats = []; // เก็บ { code: 'B13', type: 'Normal', price: 260 }
+let selectedSeats = [];
 
 async function loadUserPortal() {
   const { data: movies } = await supabaseClient.from('movies').select('*').order('movie_id').limit(10);
@@ -141,7 +140,6 @@ async function loadUserPortal() {
   loadBookingHistory();
 }
 
-// สลับหน้าจอระหว่าง Step 1 (รวมหนัง) -> Step 2 (รอบฉาย) -> Step 3 (ที่นั่ง) -> Step 4 (โปรโมชั่น & ออกตั๋ว)
 function goToStep(step) {
   [1, 2, 3, 4].forEach(s => {
     document.getElementById(`wizard-step-${s}`).classList.add('hidden');
@@ -167,7 +165,6 @@ function goToStep(step) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// STEP 1: แสดงตารางโปสเตอร์หนัง 10 เรื่องแบบ Major Cineplex
 function renderMoviesGrid() {
   const grid = document.getElementById('movie-poster-grid');
   grid.innerHTML = allMoviesData.map(m => {
@@ -193,7 +190,6 @@ function renderMoviesGrid() {
   }).join('');
 }
 
-// STEP 2: เปิดหน้ารอบฉายของหนังเรื่องที่กด
 function openMovieShowtimes(movieId) {
   selectedMovieObj = allMoviesData.find(m => m.movie_id === movieId);
   if (!selectedMovieObj) return;
@@ -214,7 +210,6 @@ function openMovieShowtimes(movieId) {
 }
 
 function renderDateAndSlots(movieId) {
-  // 1. สร้างวันที่เรียงต่อกัน 7 วัน (21 - 27 พ.ย. 2026) ไม่ข้ามวัน
   const consecutiveDates = [
     { date: '2026-11-21', dayName: 'SAT', dayNum: '21' },
     { date: '2026-11-22', dayName: 'SUN', dayNum: '22' },
@@ -229,7 +224,6 @@ function renderDateAndSlots(movieId) {
     selectedDate = consecutiveDates[0].date;
   }
 
-  // วาดปุ่มวันที่เรียงต่อกัน 21, 22, 23, 24, 25, 26, 27
   const dateContainer = document.getElementById('date-pills-container');
   dateContainer.innerHTML = consecutiveDates.map(d => {
     const active = d.date === selectedDate;
@@ -242,7 +236,6 @@ function renderDateAndSlots(movieId) {
     `;
   }).join('');
 
-  // 2. กำหนด 3 โรงภาพยนตร์ต่อวัน และสุ่มรอบฉายโรงละ 1-3 รอบเวลา
   const halls = [
     { id: 1, name: 'THEATRE 1 (IMAX LASER)', sound: 'EN/TH' },
     { id: 2, name: 'THEATRE 2 (4DX)', sound: 'TH' },
@@ -256,13 +249,11 @@ function renderDateAndSlots(movieId) {
     ['10:45', '19:30', '22:10']
   ];
 
-  // ดึง showtime_id จริงจากฐานข้อมูลมาผูกไว้เพื่อให้บันทึกลง DB ได้ไม่ติด Foreign Key
   const dbShowtimeId = showtimesData.find(s => s.movie_id === movieId)?.showtime_id || showtimesData[0]?.showtime_id || 1;
 
   document.getElementById('showtime-slots-container').innerHTML = halls.map((hall, idx) => {
-    // สุ่มจำนวนรอบ 1-3 รอบต่อโรง (อิงตามวันและโรงเพื่อความสมจริง)
     const poolIndex = (movieId + idx + parseInt(selectedDate.slice(-2))) % timePools.length;
-    const count = ((movieId + hall.id + parseInt(selectedDate.slice(-1))) % 3) + 1; // ได้ค่า 1, 2 หรือ 3 รอบ
+    const count = ((movieId + hall.id + parseInt(selectedDate.slice(-1))) % 3) + 1;
     const times = timePools[poolIndex].slice(0, count);
 
     return `
@@ -286,7 +277,6 @@ function renderDateAndSlots(movieId) {
   }).join('');
 }
 
-// ฟังก์ชันรับค่าโรง วันที่ และเวลาที่กดเลือก ส่งต่อไปหน้าเลือกที่นั่ง (Step 3)
 function openCustomSeatSelection(showtimeId, hallName, showDate, startTime) {
   selectedShowtimeObj = {
     showtime_id: showtimeId,
@@ -315,30 +305,13 @@ function changeShowDate(movieId, d) {
   renderDateAndSlots(movieId);
 }
 
-// STEP 3: เปิดหน้าเลือกที่นั่ง (Seat Map เต็มจอ + Summary ด้านขวา)
-function openSeatSelection(showtimeId) {
-  selectedShowtimeObj = showtimesData.find(s => s.showtime_id === showtimeId);
-  selectedSeats = [];
-
-  const imgUrl = MOVIE_POSTERS[selectedMovieObj.movie_id] || MOVIE_POSTERS[1];
-  document.getElementById('step3-poster').src = imgUrl;
-  document.getElementById('step3-title').textContent = selectedMovieObj.title;
-  document.getElementById('step3-duration').textContent = `🕒 ${selectedMovieObj.duration_min} นาที`;
-  document.getElementById('step3-rating').textContent = selectedMovieObj.age_rating || 'PG-13';
-  document.getElementById('step3-date').textContent = selectedShowtimeObj.show_date;
-  document.getElementById('step3-hall').textContent = selectedShowtimeObj.cinema_halls?.name || 'Theatre 1';
-  document.getElementById('step3-time').textContent = selectedShowtimeObj.start_time.slice(0, 5);
-
-  renderMajorSeatMap();
-  updateStep3Summary();
-  goToStep(3);
-}
-
 function renderMajorSeatMap() {
   const rows = ['H', 'G', 'F', 'E', 'D', 'C', 'B', 'A'];
   const cols = 14;
-  // ที่นั่งที่ถูกจองแล้วจำลองให้เหมือนในภาพ
-  const occupiedSeats = ['E10', 'E11', 'E12', 'C6', 'C7'];
+
+  // ดึงที่นั่งที่ชำระเงินแล้วของรอบฉายนี้ (ถ้ายังไม่เคยมีประวัติซื้อ จะเป็น [] ว่างทั้งหมด)
+  const slotKey = `booked_${selectedMovieObj?.movie_id}_${selectedShowtimeObj?.show_date}_${selectedShowtimeObj?.start_time}_${selectedShowtimeObj?.cinema_halls?.name}`;
+  const occupiedSeats = JSON.parse(localStorage.getItem(slotKey) || '[]');
 
   document.getElementById('seat-map-grid').innerHTML = rows.map(row => {
     const isPremium = ['H', 'G', 'F'].includes(row);
@@ -355,7 +328,7 @@ function renderMajorSeatMap() {
       const isPicked = selectedSeats.some(s => s.code === code);
 
       if (isOccupied) {
-        rowHtml += `<div class="w-6 h-6 rounded-full bg-zinc-800 border border-zinc-600 text-zinc-400 text-[10px] flex items-center justify-center cursor-not-allowed" title="ไม่ว่าง">👤</div>`;
+        rowHtml += `<div class="w-6 h-6 rounded-full bg-zinc-800 border border-zinc-600 text-zinc-400 text-[10px] flex items-center justify-center cursor-not-allowed" title="ไม่ว่าง (ชำระเงินแล้ว)">👤</div>`;
       } else if (isPicked) {
         rowHtml += `<button type="button" onclick="toggleMajorSeat('${code}', '${type}', ${price})"
           class="w-6 h-6 rounded-full bg-[#d4af37] text-slate-950 font-black text-xs flex items-center justify-center shadow ring-2 ring-white cursor-pointer" title="${code} (${price}฿)">✓</button>`;
@@ -386,7 +359,6 @@ function updateStep3Summary() {
   document.getElementById('step3-price').textContent = total.toLocaleString();
 }
 
-// STEP 4: กดปุ่ม "ซื้อตั๋ว" -> ไปหน้าโปรโมชั่นคูปองแต้มห้าง & ป๊อปคอร์น
 function proceedToCheckout() {
   if (selectedSeats.length === 0) {
     alert('กรุณาคลิกเลือกที่นั่งบนผังโรงภาพยนตร์อย่างน้อย 1 ที่นั่งก่อนครับ');
@@ -412,7 +384,6 @@ function calculateFinalCheckout() {
   document.getElementById('calc-final').textContent = finalAmount;
 }
 
-// บันทึกการจองลง Supabase และเปิด Popup E-Ticket
 async function submitUserBooking(e) {
   e.preventDefault();
   const seatTotal = Number(document.getElementById('calc-seat-price').textContent);
@@ -433,7 +404,12 @@ async function submitUserBooking(e) {
     return;
   }
 
-  // ใส่ข้อมูลครบทุกช่องลงหน้าตั๋วหนัง E-Ticket (โปสเตอร์, หนัง, วันที่, เวลา, โรง, ที่นั่ง, ยอดเงิน)
+  // บันทึกที่นั่งที่เพิ่งชำระเงินลงประวัติของรอบฉายนี้ เพื่อล็อกที่นั่งในครั้งถัดไป
+  const slotKey = `booked_${selectedMovieObj?.movie_id}_${selectedShowtimeObj?.show_date}_${selectedShowtimeObj?.start_time}_${selectedShowtimeObj?.cinema_halls?.name}`;
+  const existingBooked = JSON.parse(localStorage.getItem(slotKey) || '[]');
+  const updatedBooked = [...new Set([...existingBooked, ...selectedSeats.map(s => s.code)])];
+  localStorage.setItem(slotKey, JSON.stringify(updatedBooked));
+
   const imgUrl = MOVIE_POSTERS[selectedMovieObj?.movie_id] || MOVIE_POSTERS[1];
   document.getElementById('ticket-poster').src = imgUrl;
   document.getElementById('ticket-movie').textContent = selectedMovieObj?.title || 'Movie Ticket';
@@ -444,14 +420,14 @@ async function submitUserBooking(e) {
   document.getElementById('ticket-total').textContent = `${finalAmount} THB`;
   document.getElementById('ticket-id').textContent = data?.[0]?.booking_id || 'NEW';
 
-  // เปิดหน้าตั๋วหนังขึ้นมาโชว์
   document.getElementById('eticket-modal').classList.remove('hidden');
   loadBookingHistory();
+  loadDashboardViews();
 }
 
 function closeTicketModal() {
   document.getElementById('eticket-modal').classList.add('hidden');
-  goToStep(1); // กลับสู่หน้ารวมภาพยนตร์ 10 เรื่อง
+  goToStep(1);
 }
 
 async function loadBookingHistory() {
@@ -478,7 +454,7 @@ async function loadBookingHistory() {
 }
 
 // ==========================================
-// 3. ฝั่งแอดมิน: Dashboard Views & CRUD (ธีม Dark)
+// 3. ฝั่งแอดมิน: Dashboard Views & CRUD (Movies)
 // ==========================================
 function renderHtmlTable(rows) {
   if (!rows || rows.length === 0) return '<p class="text-sm text-slate-400 p-4">ไม่พบข้อมูล</p>';
@@ -497,11 +473,9 @@ function renderHtmlTable(rows) {
 }
 
 async function loadDashboardViews() {
-  // 1. สรุปรายได้ภาพยนตร์ (View ของโรงหนัง)
   const { data: movies } = await supabaseClient.from('v_movie_box_office_summary').select('*');
   document.getElementById('view-movies-table').innerHTML = renderHtmlTable(movies);
 
-  // 2. ตารางรอบฉายภาพยนตร์พร้อมชื่อหนังและชื่อโรง
   const { data: showtimes } = await supabaseClient
     .from('showtimes')
     .select('showtime_id, show_date, start_time, base_price, movies(title), cinema_halls(name)')
@@ -518,14 +492,40 @@ async function loadDashboardViews() {
   }));
   document.getElementById('view-stores-table').innerHTML = renderHtmlTable(formattedShowtimes);
 
-  // 3. รายการจองตั๋วภาพยนตร์ล่าสุดทั้งหมด
   const { data: bookings } = await supabaseClient
     .from('cinema_bookings')
-    .select('booking_id, customer_id, booking_time, status, original_amount, discount_amount, final_amount')
+    .select('booking_id, customer_id, booking_date, status, original_amount, discount_amount, final_amount')
     .order('booking_id', { ascending: false })
     .limit(15);
 
   document.getElementById('view-redemptions-table').innerHTML = renderHtmlTable(bookings);
+}
+
+async function loadProductsCRUD() {
+  const { data, error } = await supabaseClient
+    .from('movies')
+    .select('*')
+    .order('movie_id', { ascending: false });
+
+  if (error) return;
+
+  let html = '<table class="min-w-full text-xs text-left border-collapse">';
+  html += '<thead class="bg-slate-800 text-amber-300"><tr><th class="p-2.5">ID</th><th class="p-2.5">ชื่อภาพยนตร์</th><th class="p-2.5">ความยาว (นาที)</th><th class="p-2.5">เรตผู้ชม</th><th class="p-2.5 text-center">จัดการ</th></tr></thead><tbody class="divide-y divide-slate-800 bg-slate-900/60">';
+
+  (data || []).forEach(item => {
+    html += `<tr class="hover:bg-slate-800/70">
+      <td class="p-2.5">${item.movie_id}</td>
+      <td class="p-2.5 font-bold text-white">${item.title}</td>
+      <td class="p-2.5">${item.duration_min} นาที</td>
+      <td class="p-2.5">${item.age_rating || '-'}</td>
+      <td class="p-2.5 text-center space-x-2">
+        <button onclick='editMovieCRUD(${JSON.stringify(item)})' class="text-amber-400 hover:underline font-medium">แก้ไข</button>
+        <button onclick="deleteMovieCRUD(${item.movie_id})" class="text-rose-400 hover:underline font-medium">ลบ</button>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('crud-products-table').innerHTML = html;
 }
 
 async function saveMovieCRUD(e) {
@@ -545,7 +545,8 @@ async function saveMovieCRUD(e) {
   }
   resetMovieForm();
   loadProductsCRUD();
-  loadUserPortal(); // อัปเดตหน้าเลือกหนัง 10 เรื่องฝั่งลูกค้าให้ตรงกันทันที
+  loadUserPortal();
+  loadDashboardViews();
 }
 
 function editMovieCRUD(item) {
@@ -561,52 +562,12 @@ async function deleteMovieCRUD(id) {
   await supabaseClient.from('movies').delete().eq('movie_id', id);
   loadProductsCRUD();
   loadUserPortal();
+  loadDashboardViews();
 }
 
 function resetMovieForm() {
   document.getElementById('movie-crud-form').reset();
   document.getElementById('crud-movie-id').value = '';
-  document.getElementById('crud-submit-btn').textContent = 'บันทึก';
-}
-
-async function saveProduct(e) {
-  e.preventDefault();
-  const id = document.getElementById('prod-id').value;
-  const payload = {
-    store_id: parseInt(document.getElementById('prod-store-id').value),
-    product_code: document.getElementById('prod-code').value,
-    name: document.getElementById('prod-name').value,
-    price: parseFloat(document.getElementById('prod-price').value),
-    is_available: true
-  };
-
-  if (id) {
-    await supabaseClient.from('store_products').update(payload).eq('product_id', id);
-  } else {
-    await supabaseClient.from('store_products').insert([payload]);
-  }
-  resetProductForm();
-  loadProductsCRUD();
-}
-
-function editProduct(item) {
-  document.getElementById('prod-id').value = item.product_id;
-  document.getElementById('prod-store-id').value = item.store_id;
-  document.getElementById('prod-code').value = item.product_code;
-  document.getElementById('prod-name').value = item.name;
-  document.getElementById('prod-price').value = item.price;
-  document.getElementById('crud-submit-btn').textContent = 'อัปเดต';
-}
-
-async function deleteProduct(id) {
-  if (!confirm('ยืนยันการลบสินค้านี้?')) return;
-  await supabaseClient.from('store_products').delete().eq('product_id', id);
-  loadProductsCRUD();
-}
-
-function resetProductForm() {
-  document.getElementById('product-form').reset();
-  document.getElementById('prod-id').value = '';
   document.getElementById('crud-submit-btn').textContent = 'บันทึก';
 }
 
@@ -655,6 +616,11 @@ async function sendChatQuestion(e) {
           <div class="overflow-x-auto max-h-48 rounded-lg border border-slate-700">${renderHtmlTable(result.data)}</div>
         </div>
       </div>`;
+
+    if (result.refreshNeeded) {
+      loadBookingHistory();
+      loadDashboardViews();
+    }
   } catch (err) {
     chatBox.innerHTML += `
       <div class="bg-rose-950/60 border border-rose-500/50 text-rose-300 p-3 rounded-xl text-xs">
