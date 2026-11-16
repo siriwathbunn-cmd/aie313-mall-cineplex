@@ -105,270 +105,249 @@
   <main id="app-main" class="max-w-7xl mx-auto px-4 py-6">
 
     <!-- ============================================================== -->
-    <!-- VIEW 1: ฝั่งผู้ใช้งาน (USER / CUSTOMER VIEW)                    -->
-    <!-- ============================================================== -->
-    <!-- ============================================================== -->
-    <!-- VIEW 1: ฝั่งผู้ใช้งาน (CINEMA 4-STEP INTERACTIVE BOOKING)        -->
+    <!-- VIEW 1: ฝั่งผู้ใช้งาน (MAJOR CINEPLEX 4-STEP WIZARD FLOW)       -->
     <!-- ============================================================== -->
     <div id="view-user" class="space-y-6">
 
-      <!-- แถบบัตรสมาชิกห้างแบบกะทัดรัด (Mall Loyalty Strip) -->
+      <!-- แถบสมาชิกห้างด้านบน (กดดูประวัติตั๋วได้) -->
       <div
-        class="glass-card px-5 py-3.5 rounded-2xl flex flex-wrap justify-between items-center gap-4 border-amber-500/30">
+        class="bg-zinc-900/90 border border-zinc-800 px-5 py-3 rounded-2xl flex flex-wrap justify-between items-center gap-3">
         <div class="flex items-center gap-3">
-          <div
-            class="gold-gradient text-slate-950 w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg shadow">
-            👑</div>
+          <span
+            class="gold-gradient text-slate-950 w-9 h-9 rounded-xl flex items-center justify-center font-black shadow">👑</span>
           <div>
-            <div class="flex items-center gap-2">
-              <span id="member-name" class="font-bold text-sm text-white">Somchai Prasert</span>
-              <span
-                class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full">Classic
-                Tier</span>
-            </div>
-            <p class="text-[11px] text-slate-400">ใช้แต้มสะสมจากห้างแลกคูปองส่วนลดค่าตั๋วหนังได้ทันที</p>
+            <span id="member-name" class="font-bold text-sm text-white">Somchai Prasert</span>
+            <span
+              class="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full ml-1.5">Classic
+              Tier</span>
+            <span class="block text-[11px] text-zinc-400">เชื่อมต่อคะแนนสะสมห้าง & คูปองส่วนลดโรงภาพยนตร์</span>
           </div>
         </div>
         <div class="flex items-center gap-4">
           <div class="text-right">
-            <span class="text-[10px] text-slate-400 block">คะแนนสะสมห้าง</span>
-            <span id="member-points" class="text-lg font-extrabold text-amber-400">450 PTS</span>
+            <span class="text-[10px] text-zinc-400 block">แต้มสะสมคงเหลือ</span>
+            <span id="member-points" class="text-base font-extrabold text-amber-400">450 PTS</span>
           </div>
           <button onclick="document.getElementById('history-drawer').classList.toggle('hidden')"
-            class="bg-slate-800 hover:bg-slate-700 border border-slate-600 px-3.5 py-2 rounded-xl text-xs font-medium text-amber-300 transition">
+            class="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 px-3.5 py-2 rounded-xl text-xs font-medium text-amber-300 transition cursor-pointer">
             🎫 ประวัติตั๋วของฉัน
           </button>
         </div>
       </div>
 
-      <!-- ลิ้นชักประวัติตั๋ว (ซ่อนไว้ กดปุ่มด้านบนเพื่อเปิดดู) -->
-      <div id="history-drawer" class="hidden glass-card p-5 rounded-2xl border-slate-700">
+      <!-- ลิ้นชักประวัติตั๋ว (ซ่อนไว้ กดปุ่มด้านบนเพื่อเปิด) -->
+      <div id="history-drawer" class="hidden bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
         <div class="flex justify-between items-center mb-3">
-          <h3 class="font-bold text-sm text-white">🎫 ประวัติการจองตั๋วภาพยนตร์ล่าสุด (Recent E-Tickets)</h3>
-          <button onclick="loadUserPortal()" class="text-xs text-amber-400 hover:underline">🔄 รีเฟรช</button>
+          <h3 class="font-bold text-sm text-white">🎫 ประวัติการจองตั๋วภาพยนตร์ล่าสุด</h3>
+          <button onclick="loadBookingHistory()" class="text-xs text-amber-400 hover:underline">🔄 รีเฟรช</button>
         </div>
         <div id="user-bookings-list" class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">กำลังโหลด...</div>
       </div>
 
-      <!-- Layout 3 คอลัมน์ตามแบบร่าง (ซ้าย: หนัง+รอบฉาย | กลาง: ผังที่นั่ง | ขวา: โปรโมชั่น+Checkout) -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-
-        <!-- คอลัมน์ซ้าย (5 ส่วน): 1. เลือกภาพยนตร์ 10 เรื่อง + 2. เลือกวันที่และรอบฉาย -->
-        <div class="lg:col-span-5 space-y-5">
-          <!-- Step 1: แกลเลอรีหนัง 10 เรื่อง (เลื่อนซ้าย-ขวาได้) -->
-          <div class="glass-card p-5 rounded-2xl space-y-3">
-            <div class="flex justify-between items-center">
-              <h2 class="font-bold text-base text-white">1. เลือกภาพยนตร์ <span
-                  class="text-xs font-normal text-slate-400">(Select Movie)</span></h2>
-              <span id="movie-count-badge" class="text-xs text-amber-400 font-medium">10 เรื่อง</span>
-            </div>
-            <div id="movie-poster-grid" class="flex gap-3 overflow-x-auto pb-2 snap-x">
-              <!-- โปสเตอร์ 10 เรื่องจะถูกสร้างจาก JS -->
-            </div>
-          </div>
-
-          <!-- Step 2: เลือกวันที่และรอบฉาย -->
-          <div class="glass-card p-5 rounded-2xl space-y-4">
-            <h2 class="font-bold text-base text-white">2. เลือกรอบและวันที่ <span
-                class="text-xs font-normal text-slate-400">(Showtime & Date)</span></h2>
-
-            <!-- ปุ่มเลือกวันที่ -->
-            <div id="date-pills-container" class="flex gap-2 overflow-x-auto pb-1">
-              <!-- สร้างปุ่มวันที่จาก JS -->
-            </div>
-
-            <!-- ปุ่มเลือกรอบฉายแยกตามโรง -->
-            <div id="showtime-slots-container" class="space-y-3 max-h-64 overflow-y-auto pr-1">
-              <!-- สร้างปุ่มรอบฉายจาก JS -->
-            </div>
-          </div>
-        </div>
-
-        <!-- คอลัมน์กลาง (4 ส่วน): 3. ผังเลือกที่นั่ง (Interactive Seat Map) -->
-        <div class="lg:col-span-4 glass-card p-5 rounded-2xl space-y-4">
-          <div class="flex justify-between items-center">
-            <h2 class="font-bold text-base text-white">3. เลือกที่นั่ง <span
-                class="text-xs font-normal text-slate-400">(Select Seats)</span></h2>
-            <span id="selected-seat-badge"
-              class="text-xs bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded-full font-semibold">ยังไม่เลือกที่นั่ง</span>
-          </div>
-
-          <!-- โค้งหน้าจอภาพยนตร์ (Screen) -->
-          <div class="pt-2 pb-4 text-center">
-            <div
-              class="w-4/5 mx-auto h-2 bg-gradient-to-r from-transparent via-amber-400 to-transparent rounded-full shadow-[0_8px_20px_rgba(251,191,36,0.5)]">
-            </div>
-            <span class="text-[10px] text-slate-400 tracking-widest uppercase mt-2 block">หน้าจอ (SCREEN)</span>
-          </div>
-
-          <!-- ผังเก้าอี้จำลอง -->
-          <div id="seat-map-grid" class="space-y-2.5 py-2 select-none">
-            <!-- สร้างผังที่นั่ง Sofa / Premium / Standard จาก JS -->
-          </div>
-
-          <!-- คำอธิบายราคาเก้าอี้ 3 ระดับ -->
-          <div class="pt-3 border-t border-slate-700/80 grid grid-cols-3 gap-2 text-center text-[11px]">
-            <div class="bg-slate-900/90 p-2 rounded-xl border border-rose-500/30">
-              <span class="inline-block w-3 h-3 rounded bg-rose-600 mb-1"></span>
-              <div class="font-bold text-white">Sofa Bed</div>
-              <div class="text-rose-400">600 ฿</div>
-            </div>
-            <div class="bg-slate-900/90 p-2 rounded-xl border border-amber-500/30">
-              <span class="inline-block w-3 h-3 rounded bg-amber-500 mb-1"></span>
-              <div class="font-bold text-white">Premium</div>
-              <div class="text-amber-400">400 ฿</div>
-            </div>
-            <div class="bg-slate-900/90 p-2 rounded-xl border border-sky-500/30">
-              <span class="inline-block w-3 h-3 rounded bg-sky-600 mb-1"></span>
-              <div class="font-bold text-white">Standard</div>
-              <div class="text-sky-400">300 ฿</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- คอลัมน์ขวา (3 ส่วน): 4. โปรโมชั่น & Checkout & ปุ่มออกตั๋ว -->
-        <div class="lg:col-span-3 glass-card p-5 rounded-2xl space-y-4">
-          <h2 class="font-bold text-base text-white">4. โปรโมชั่น & สรุปตั๋ว</h2>
-
-          <!-- เลือกคูปองแต้มห้าง -->
-          <div>
-            <label class="block text-xs text-amber-300 font-medium mb-1">🎁 ใช้คูปองแต้มห้าง (Coupons)</label>
-            <select id="book-coupon" onchange="calculateBookingTotal()"
-              class="w-full bg-slate-900 border border-amber-500/40 rounded-xl px-3 py-2 text-xs text-amber-100 focus:outline-amber-400"></select>
-          </div>
-
-          <!-- เลือกชุดป๊อปคอร์น -->
-          <div>
-            <label class="block text-xs text-slate-300 font-medium mb-1">🍿 ชุดป๊อปคอร์น & เครื่องดื่ม</label>
-            <select id="book-concession" onchange="calculateBookingTotal()"
-              class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-amber-400"></select>
-          </div>
-
-          <!-- กล่อง Checkout สรุปราคา -->
-          <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-4 space-y-2.5 text-xs">
-            <div class="font-bold text-sm text-white border-b border-slate-800 pb-2">Checkout</div>
-            <div class="text-amber-400 font-semibold truncate" id="summary-movie-title">กรุณาเลือกภาพยนตร์</div>
-            <div class="text-slate-400 text-[11px]" id="summary-showtime-info">รอบฉาย: -</div>
-
-            <div class="flex justify-between pt-1">
-              <span class="text-slate-300" id="summary-seat-label">ตั๋วหนัง (ยังไม่เลือกที่นั่ง)</span>
-              <span class="font-semibold text-white"><span id="calc-seat-price">0</span> ฿</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-slate-300">ชุดป๊อปคอร์น/ของว่าง</span>
-              <span class="font-semibold text-white"><span id="calc-snack-price">0</span> ฿</span>
-            </div>
-            <div class="flex justify-between text-emerald-400">
-              <span>ส่วนลดคูปองห้าง</span>
-              <span class="font-semibold">-<span id="calc-discount">0</span> ฿</span>
-            </div>
-
-            <div class="border-t border-slate-800 pt-2.5 flex justify-between items-baseline">
-              <span class="text-slate-300 font-medium">ยอดชำระสุทธิ</span>
-              <span class="text-2xl font-black text-amber-400"><span id="calc-final">0</span> ฿</span>
-            </div>
-          </div>
-
-          <button onclick="submitUserBooking(event)"
-            class="w-full gold-gradient hover:opacity-95 text-slate-950 font-extrabold py-3 rounded-xl shadow-lg shadow-amber-500/20 text-xs transition cursor-pointer">
-            ยืนยันการจอง & ออกตั๋วหนัง<br><span class="text-[10px] font-semibold opacity-80">(Confirm & E-Ticket)</span>
+      <!-- STEP BAR (แถบสถานะ 3 ขั้นตอนแบบ Major Cineplex - ซ่อนอยู่หน้าแรก จะโผล่เมื่อเลือกหนัง) -->
+      <div id="booking-step-bar" class="hidden">
+        <div class="flex items-center justify-between mb-3">
+          <button onclick="goToStep(1)"
+            class="text-xs text-zinc-400 hover:text-amber-400 flex items-center gap-1 cursor-pointer">
+            ← กลับไปหน้ารวมภาพยนตร์ทั้งหมด
           </button>
         </div>
-
-      </div>
-    </div>
-
-    <!-- 2. แกลเลอรีภาพยนตร์แนะนำ (คลิกที่โปสเตอร์เพื่อเลือกรอบฉายอัตโนมัติ) -->
-    <div>
-      <div class="flex justify-between items-end mb-4">
-        <div>
-          <h2 class="text-xl font-bold text-white flex items-center gap-2">🎬 ภาพยนตร์กำลังเข้าฉาย (Now Showing)</h2>
-          <p class="text-xs text-slate-400">คลิกที่โปสเตอร์ภาพยนตร์เพื่อเลือกรอบฉายด้านล่างได้ทันที</p>
+        <div class="grid grid-cols-3 border border-zinc-700 rounded-xl overflow-hidden text-xs font-bold text-center">
+          <div id="step-tab-2" onclick="goToStep(2)" class="py-3 bg-white text-slate-950 cursor-pointer transition">
+            1. เลือกรอบภาพยนตร์
+          </div>
+          <div id="step-tab-3" class="py-3 bg-zinc-900 text-zinc-400 border-x border-zinc-700 transition">
+            2. เลือกที่นั่ง
+          </div>
+          <div id="step-tab-4" class="py-3 bg-zinc-900 text-zinc-400 transition">
+            3. ซื้อตั๋ว & โปรโมชั่น
+          </div>
         </div>
       </div>
-      <div id="movie-poster-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-        <!-- โปสเตอร์จะถูกสร้างจาก JS อัตโนมัติ -->
-      </div>
-    </div>
 
-    <!-- 3. โซนจองตั๋ว & ประวัติการจอง -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- ฟอร์มจองตั๋วหนัง + รูปตัวอย่างของว่าง + คูปอง -->
-      <div class="lg:col-span-2 glass-card p-6 rounded-2xl shadow-xl space-y-5">
-        <div class="flex items-center justify-between border-b border-slate-700 pb-3">
-          <h3 class="font-bold text-lg text-amber-400">🎟️ ออกบัตรชมภาพยนตร์ & ใช้สิทธิ์คูปองห้าง</h3>
-          <span class="text-xs text-slate-400">เลือกข้อมูลครบ 3 ขั้นตอน</span>
+      <!-- ============================================================ -->
+      <!-- STEP 1: หน้าแรกรวมภาพยนตร์ 10 เรื่อง (GRID 5 คอลัมน์)          -->
+      <!-- ============================================================ -->
+      <div id="wizard-step-1" class="space-y-4">
+        <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+          <h2 class="text-xl font-bold text-white tracking-wide">ภาพยนตร์กำลังฉาย <span
+              class="text-amber-400 text-sm font-normal ml-1">(NOW SHOWING)</span></h2>
+          <span class="text-xs text-zinc-400">คลิกที่โปสเตอร์ภาพยนตร์เพื่อเลือกรอบฉาย</span>
+        </div>
+        <div id="movie-poster-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-5">
+          <!-- สร้างการ์ดหนัง 10 เรื่องจาก JS -->
+        </div>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- STEP 2: หน้ารายละเอียดหนัง + เลือกวันที่ + เลือกรอบฉาย        -->
+      <!-- ============================================================ -->
+      <div id="wizard-step-2" class="hidden space-y-6">
+        <!-- แบนเนอร์รายละเอียดหนังที่เลือก -->
+        <div
+          class="bg-gradient-to-r from-zinc-900 via-zinc-900 to-amber-950/30 border border-zinc-800 rounded-2xl p-6 flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+          <img id="step2-poster" src="" alt="Poster"
+            class="w-44 h-64 object-cover rounded-xl shadow-2xl border border-zinc-700 shrink-0" />
+          <div class="space-y-3 text-center sm:text-left">
+            <div id="step2-release" class="text-xs font-semibold text-amber-400">04 November 2026</div>
+            <h1 id="step2-title" class="text-2xl md:text-3xl font-extrabold text-white">Movie Title</h1>
+            <p id="step2-genre" class="text-xs text-zinc-400">แอ็คชัน , ผจญภัย , วิทยาศาสตร์</p>
+            <div class="flex flex-wrap justify-center sm:justify-start items-center gap-3 pt-1">
+              <span id="step2-rating"
+                class="bg-amber-500/20 text-amber-300 border border-amber-500/40 text-xs font-bold px-2.5 py-1 rounded">PG-13</span>
+              <span id="step2-duration" class="text-xs text-zinc-300 flex items-center gap-1">🕒 135 นาที</span>
+            </div>
+          </div>
         </div>
 
-        <form id="user-booking-form" onsubmit="submitUserBooking(event)" class="space-y-5">
-          <!-- แสดงพรีวิวหนังที่เลือก -->
-          <div class="bg-slate-900/90 border border-slate-700 rounded-xl p-4 flex items-center gap-4">
-            <img id="selected-movie-img"
-              src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=300&q=80"
-              alt="Movie Poster" class="w-16 h-24 object-cover rounded-lg shadow border border-slate-600" />
-            <div class="flex-1">
-              <span
-                class="text-[10px] bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-2 py-0.5 rounded">รอบฉายที่เลือก</span>
-              <h4 id="selected-movie-title" class="font-bold text-base text-white mt-1">กำลังโหลดข้อมูลภาพยนตร์...
-              </h4>
-              <p id="selected-movie-meta" class="text-xs text-slate-400 mt-0.5">กรุณาเลือกรอบฉายด้านล่าง</p>
-            </div>
+        <!-- แถบเลือกวันที่แบบสี่เหลี่ยม (Mon 16, Tue 17...) -->
+        <div class="space-y-2">
+          <div class="text-xs text-zinc-400 font-semibold">เลือกวันที่ฉาย (Select Date)</div>
+          <div id="date-pills-container" class="flex gap-2.5 overflow-x-auto pb-2">
+            <!-- สร้างปุ่มวันที่จาก JS -->
           </div>
+        </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-medium text-slate-300 mb-1.5">1. เลือกรอบฉายภาพยนตร์ (Showtime)</label>
-              <select id="book-showtime" onchange="calculateBookingTotal()"
-                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-amber-500"></select>
-            </div>
-            <div>
-              <label class="block text-xs font-medium text-slate-300 mb-1.5">2. เลือกชุดป๊อปคอร์น/เครื่องดื่ม
-                (Concession)</label>
-              <select id="book-concession" onchange="calculateBookingTotal()"
-                class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white focus:outline-amber-500"></select>
-            </div>
-          </div>
+        <!-- รายการโรงภาพยนตร์และปุ่มเวลารอบฉาย -->
+        <div id="showtime-slots-container" class="space-y-4">
+          <!-- สร้างรายการโรงและรอบเวลาจาก JS -->
+        </div>
+      </div>
 
-          <!-- การ์ดคูปองส่วนลดห้าง -->
-          <div class="bg-amber-500/10 border border-amber-500/30 p-4 rounded-xl">
-            <label class="block text-xs font-semibold text-amber-300 mb-1.5">🎁 3. ใช้คูปองส่วนลดจากคะแนนสะสมห้าง
-              (Mall Loyalty Coupons)</label>
-            <select id="book-coupon" onchange="calculateBookingTotal()"
-              class="w-full bg-slate-900 border border-amber-500/50 rounded-xl px-3.5 py-2.5 text-sm text-amber-200 focus:outline-amber-400"></select>
-          </div>
-
-          <!-- สรุปยอดชำระ -->
+      <!-- ============================================================ -->
+      <!-- STEP 3: หน้าผังเลือกที่นั่งเต็มจอ + กล่อง SUMMARY ด้านขวา      -->
+      <!-- ============================================================ -->
+      <div id="wizard-step-3" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- ฝั่งซ้าย (8 ส่วน): จอ SCREEN + เก้าอี้สีแดงเรียงแถว -->
+        <div class="lg:col-span-8 bg-zinc-950 border border-zinc-800 rounded-2xl p-6 space-y-6">
+          <!-- กรอบ SCREEN สีทองแบบ Major -->
           <div
-            class="bg-slate-900 p-4 rounded-xl border border-slate-700 flex flex-wrap justify-between items-center gap-4">
-            <div class="text-xs space-y-1 text-slate-300">
-              <div>ราคาตั๋วภาพยนตร์ + ชุดของว่าง: <span id="calc-original" class="font-semibold text-white">0</span>
-                บาท</div>
-              <div class="text-emerald-400">ส่วนลดคูปองสมาชิกห้าง: -<span id="calc-discount"
-                  class="font-semibold">0</span> บาท</div>
+            class="w-4/5 mx-auto border border-amber-500/50 bg-gradient-to-b from-amber-500/15 to-transparent py-2.5 text-center rounded-sm shadow-[0_10px_30px_rgba(245,158,11,0.15)]">
+            <span class="text-sm font-bold tracking-[0.35em] text-zinc-200">SCREEN</span>
+          </div>
+
+          <!-- ผังที่นั่งจำลอง -->
+          <div class="overflow-x-auto py-2">
+            <div id="seat-map-grid" class="min-w-[520px] space-y-2.5 select-none">
+              <!-- สร้างแถวเก้าอี้จาก JS -->
+            </div>
+          </div>
+
+          <!-- คำอธิบายประเภทที่นั่งด้านล่าง -->
+          <div class="flex justify-center gap-4 pt-4 border-t border-zinc-800/80 text-xs">
+            <div class="border border-zinc-700 bg-zinc-900/80 px-5 py-3 rounded-xl text-center">
+              <div class="text-red-500 text-lg mb-1">💺</div>
+              <div class="font-bold text-white">Normal (A-E)</div>
+              <div class="text-amber-400 font-semibold">260 THB</div>
+            </div>
+            <div class="border border-amber-500/40 bg-zinc-900/80 px-5 py-3 rounded-xl text-center">
+              <div class="text-amber-400 text-lg mb-1">🛋️</div>
+              <div class="font-bold text-white">Premium (F-H)</div>
+              <div class="text-amber-400 font-semibold">340 THB</div>
+            </div>
+            <div class="border border-zinc-700 bg-zinc-900/80 px-5 py-3 rounded-xl text-center opacity-60">
+              <div class="text-zinc-400 text-lg mb-1">👤</div>
+              <div class="font-bold text-zinc-300">ไม่ว่าง</div>
+              <div class="text-zinc-500">Sold Out</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ฝั่งขวา (4 ส่วน): กล่อง SUMMARY + ปุ่มซื้อตั๋วสีทอง -->
+        <div class="lg:col-span-4 bg-zinc-950 border border-zinc-700 rounded-2xl p-6 space-y-5 sticky top-20">
+          <div class="text-xs font-bold tracking-widest text-zinc-400 uppercase">SUMMARY</div>
+
+          <div class="flex gap-4 items-start border-b border-zinc-800 pb-4">
+            <img id="step3-poster" src="" alt="Poster"
+              class="w-20 h-28 object-cover rounded-lg border border-zinc-700" />
+            <div class="space-y-1.5">
+              <h3 id="step3-title" class="font-bold text-base text-white leading-snug">Movie Title</h3>
+              <div class="text-xs text-zinc-400">🔊 TH / EN Sub</div>
+              <div id="step3-duration" class="text-xs text-zinc-400">🕒 135 นาที</div>
+              <span id="step3-rating"
+                class="inline-block bg-amber-500/20 text-amber-300 text-[10px] font-bold px-2 py-0.5 rounded">PG-13</span>
+            </div>
+          </div>
+
+          <div class="space-y-1 border-b border-zinc-800 pb-4">
+            <div class="text-xs text-zinc-400">รอบฉาย</div>
+            <div class="font-bold text-sm text-white">พารากอน ซีนีเพล็กซ์</div>
+            <div id="step3-date" class="text-xs text-amber-400 font-semibold">MON 16 NOV</div>
+            <div class="flex justify-between items-center pt-1">
+              <span id="step3-hall" class="text-xs text-zinc-300">Theatre 1</span>
+              <span id="step3-time" class="bg-white text-slate-950 font-bold text-xs px-3 py-1 rounded">18:10</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <div>
+              <div class="text-xs text-zinc-400">ที่นั่ง:</div>
+              <div id="step3-seats" class="font-bold text-lg text-white break-words">-</div>
             </div>
             <div class="text-right">
-              <div class="text-xs text-slate-400">ยอดชำระสุทธิ (Net Total)</div>
-              <div class="text-3xl font-extrabold text-amber-400"><span id="calc-final">0</span> ฿</div>
+              <div class="text-xs text-zinc-400">ราคา</div>
+              <div class="font-extrabold text-xl text-white"><span id="step3-price">0</span> THB</div>
             </div>
           </div>
 
-          <button type="submit"
-            class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold py-3 rounded-xl shadow-lg shadow-amber-500/20 transition cursor-pointer">
-            ✅ ยืนยันการจองตั๋วภาพยนตร์ทันที
+          <button type="button" onclick="proceedToCheckout()"
+            class="w-full bg-[#d4af37] hover:bg-[#e5c158] text-slate-950 font-extrabold py-3.5 rounded-xl text-sm transition cursor-pointer shadow-lg">
+            ซื้อตั๋ว
           </button>
-        </form>
+        </div>
       </div>
 
-      <!-- ประวัติการจองล่าสุด (สไตล์ตั๋วหนัง E-Ticket) -->
-      <div class="glass-card p-6 rounded-2xl shadow-xl flex flex-col">
-        <div class="flex justify-between items-center border-b border-slate-700 pb-3 mb-4">
-          <h3 class="font-bold text-base text-white">🎫 ตั๋วของฉัน (Recent E-Tickets)</h3>
-          <button onclick="loadUserPortal()" class="text-xs text-amber-400 hover:underline">🔄 รีเฟรช</button>
+      <!-- ============================================================ -->
+      <!-- STEP 4: หน้าโปรโมชั่น คูปองแต้มห้าง ป๊อปคอร์น & ยืนยันออกตั๋ว  -->
+      <!-- ============================================================ -->
+      <div id="wizard-step-4"
+        class="hidden max-w-2xl mx-auto bg-zinc-900 border border-zinc-700 rounded-2xl p-6 space-y-5 shadow-2xl">
+        <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+          <h2 class="text-lg font-bold text-amber-400">🎁 โปรโมชั่นส่วนลดแต้มห้าง & ชุดป๊อปคอร์น</h2>
+          <button onclick="goToStep(3)" class="text-xs text-zinc-400 hover:text-white">← แก้ไขที่นั่ง</button>
         </div>
-        <div id="user-bookings-list" class="space-y-3 overflow-y-auto max-h-[460px] flex-1 text-xs pr-1">กำลังโหลด...
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-amber-300 mb-1.5">1. เลือกใช้คูปองส่วนลดจากคะแนนสะสมห้าง
+              (Mall Loyalty Coupons)</label>
+            <select id="book-coupon" onchange="calculateFinalCheckout()"
+              class="w-full bg-zinc-950 border border-amber-500/40 rounded-xl px-3.5 py-2.5 text-sm text-amber-200"></select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-zinc-300 mb-1.5">2. เพิ่มชุดป๊อปคอร์น & เครื่องดื่ม
+              (Concession)</label>
+            <select id="book-concession" onchange="calculateFinalCheckout()"
+              class="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-3.5 py-2.5 text-sm text-white"></select>
+          </div>
         </div>
+
+        <div class="bg-zinc-950 border border-zinc-800 rounded-xl p-5 space-y-2.5 text-sm">
+          <div class="flex justify-between">
+            <span class="text-zinc-400">ค่าบัตรชมภาพยนตร์ (<span id="step4-seat-list">-</span>)</span>
+            <span class="font-bold text-white"><span id="calc-seat-price">0</span> THB</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-zinc-400">ชุดป๊อปคอร์น/เครื่องดื่ม</span>
+            <span class="font-bold text-white"><span id="calc-snack-price">0</span> THB</span>
+          </div>
+          <div class="flex justify-between text-emerald-400">
+            <span>ส่วนลดคูปองสมาชิกห้าง</span>
+            <span class="font-bold">-<span id="calc-discount">0</span> THB</span>
+          </div>
+          <div class="border-t border-zinc-800 pt-3 flex justify-between items-baseline">
+            <span class="font-bold text-zinc-200">ยอดชำระสุทธิ (Net Total)</span>
+            <span class="text-3xl font-black text-amber-400"><span id="calc-final">0</span> THB</span>
+          </div>
+        </div>
+
+        <button type="button" onclick="submitUserBooking(event)"
+          class="w-full gold-gradient hover:opacity-95 text-slate-950 font-extrabold py-3.5 rounded-xl text-base shadow-xl transition cursor-pointer">
+          ✅ ยืนยันการชำระเงิน & ออกตั๋ว E-Ticket
+        </button>
       </div>
-    </div>
+
     </div>
 
     <!-- ============================================================== -->
